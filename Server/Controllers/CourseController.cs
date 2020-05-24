@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Server.Controllers
@@ -106,5 +107,22 @@ namespace Server.Controllers
                 return JsonConvert.SerializeObject(ex.InnerException.Message);
             }
         }
+
+
+        /*[HttpDelete("{courseId}")]
+        public string Delete(string courseId)
+        {
+            try
+            {
+                Microsoft.Data.SqlClient.SqlParameter _courseId = new Microsoft.Data.SqlClient.SqlParameter("@cid", courseId);
+                dbContext.Course.FromSqlRaw("deleteCourse @cid", _courseId).ToList();
+                return JsonConvert.SerializeObject("Delete all from Member OK - Remote DB");
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(ex.Message);
+            }
+        }*/
+
     }
 }

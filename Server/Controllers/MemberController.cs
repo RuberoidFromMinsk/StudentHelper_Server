@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -56,8 +58,9 @@ namespace Server.Controllers
             }
         }
 
+
         // DELETE api/<controller>/5
-        [HttpDelete("{courseid, id}")]
+        [HttpDelete("{courseid}/{id}")]
         public string Delete(string courseid, string id)
         {
             try
@@ -69,8 +72,66 @@ namespace Server.Controllers
             }
             catch(Exception ex)
             {
+                return JsonConvert.SerializeObject(ex.Message);
+            }
+        }
+
+        [HttpDelete("{courseId}")]
+        public string Delete(string courseId)
+        {
+            try
+            {
+                int count = dbContext.Member.Where(x => x.CourseId.Equals(courseId)).Count();
+                List<Member> list = new List<Member>();
+                for (int i = 0; i < count; i++)
+                {
+                    Member member = dbContext.Member.Where(u => u.CourseId.Equals(courseId)).OrderBy(u => u.CourseId).Skip(i).FirstOrDefault();
+                    list.Add(member);
+                }
+                dbContext.Member.RemoveRange(list);
+                dbContext.SaveChangesAsync();
+                //Member member = dbContext.Member.FirstOrDefault(u => u.CourseId.Equals(courseid) && u.MemberId.Equals(id));
+                //dbContext.Member.Remove(member);
+                //dbContext.SaveChangesAsync();
+                return JsonConvert.SerializeObject("Delete from Member OK - Remote DB");
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(ex.Message);
+            }
+        }
+
+
+
+        /*[HttpDelete("{courseId, memberId}")]
+        public string Delete(string courseId, string memberId)
+        {
+            try
+            {
+                Microsoft.Data.SqlClient.SqlParameter _courseId = new Microsoft.Data.SqlClient.SqlParameter("@cid", courseId);
+                Microsoft.Data.SqlClient.SqlParameter _memberId = new Microsoft.Data.SqlClient.SqlParameter("@mid", memberId);
+                dbContext.Member.FromSqlRaw("deleteMember @cid, @mid", _courseId, _memberId).ToList();
+                return JsonConvert.SerializeObject("Delete from Member OK - Remote DB");
+            }
+            catch (Exception ex)
+            {
                 return JsonConvert.SerializeObject(ex.InnerException.Message);
             }
         }
+
+        [HttpDelete("{courseId}")]
+        public string Delete(string courseId)
+        {
+            try
+            {
+                Microsoft.Data.SqlClient.SqlParameter _courseId = new Microsoft.Data.SqlClient.SqlParameter("@cid", courseId);
+                dbContext.Member.FromSqlRaw("deleteAllFromCourse @cid", _courseId).ToList();
+                return JsonConvert.SerializeObject("Delete all from Member OK - Remote DB");
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(ex.InnerException.Message);
+            }
+        }*/
     }
 }
